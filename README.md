@@ -14,29 +14,56 @@ of just looping.
   visible cursor.
 - `lobbyloop-server.service`: systemd unit to start `server.py` on boot.
 - `lobbyloop-kiosk.service`: systemd unit to start Chromium kiosk mode on boot.
+- `install.sh`: automates the setup steps below.
 
-## Setup on the Raspberry Pi
+## Quick install
 
-1. Use Raspberry Pi OS with a desktop, not the Lite version, since you need
-   a display session for Chromium to run in. Raspberry Pi OS with Wayland or
-   X11 both work.
+Use Raspberry Pi OS with a desktop, not the Lite version, since you need a
+display session for Chromium to run in. Raspberry Pi OS with Wayland or X11
+both work.
 
-2. Copy this whole folder to the Pi, for example to `/home/pi/lobbyloop`.
+On the Pi, run:
 
-3. Put your GIF files in `/home/pi/lobbyloop/posters`.
+```
+curl -fsSL https://raw.githubusercontent.com/rorpage/lobbyloop/main/install.sh | sudo bash
+```
 
-4. Install Chromium and unclutter if they are not already installed:
+This clones the repo to `/home/pi/lobbyloop`, installs Chromium and
+unclutter, sets permissions, and installs and starts the two systemd
+services. Running it again later pulls the latest version and restarts the
+services.
+
+After it finishes, add your GIF files to `/home/pi/lobbyloop/posters`, then
+reboot:
+
+```
+sudo reboot
+```
+
+The Pi should come up straight into the poster loop with no desktop
+visible.
+
+## Manual setup
+
+If you would rather set it up by hand, or want to understand what
+`install.sh` is doing:
+
+1. Copy this whole folder to the Pi, for example to `/home/pi/lobbyloop`.
+
+2. Put your GIF files in `/home/pi/lobbyloop/posters`.
+
+3. Install Chromium and unclutter if they are not already installed:
    ```
    sudo apt update
    sudo apt install chromium-browser unclutter
    ```
 
-5. Make the kiosk script executable:
+4. Make the kiosk script executable:
    ```
    chmod +x /home/pi/lobbyloop/kiosk.sh
    ```
 
-6. Test it manually first, before setting up autostart:
+5. Test it manually first, before setting up autostart:
    ```
    python3 /home/pi/lobbyloop/server.py
    ```
@@ -44,7 +71,7 @@ of just looping.
    open `http://<pi-ip-address>:8080` in a browser and confirm the GIFs
    cycle correctly.
 
-7. If that works, set up the two services so everything starts on boot:
+6. If that works, set up the two services so everything starts on boot:
    ```
    sudo cp lobbyloop-server.service /etc/systemd/system/
    sudo cp lobbyloop-kiosk.service /etc/systemd/system/
@@ -55,7 +82,7 @@ of just looping.
    sudo systemctl start lobbyloop-kiosk.service
    ```
 
-8. Reboot the Pi and confirm it comes up straight into the poster loop with
+7. Reboot the Pi and confirm it comes up straight into the poster loop with
    no desktop visible:
    ```
    sudo reboot

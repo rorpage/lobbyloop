@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>LobbyLoop</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background: black;
+    overflow: hidden;
+  }
+  #poster {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+  #status {
+    position: fixed;
+    bottom: 8px;
+    right: 12px;
+    color: #444;
+    font-family: monospace;
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+  <img id="poster" src="" alt="poster">
+  <div id="status"></div>
+
+  <script>
+    // Config. Edit these values to change behavior.
+    const CONFIG = {
+      posterFolder: "posters",
+      cycleSeconds: 15,        // how long each GIF stays on screen
+      enableJellyfin: false,   // set to true later to enable now-playing mode
+      jellyfinPollSeconds: 10  // how often to check Jellyfin for now-playing
+    };
+
+    let posterList = [];
+    let currentIndex = 0;
+    let cycleTimer = null;
+
+    const posterEl = document.getElementById("poster");
+    const statusEl = document.getElementById("status");
+
+    async function loadPosterList() {
+      const res = await fetch("/api/posters");
+      if (!res.ok) {
+        statusEl.textContent = "Could not load poster list.";
+        return [];
+      }
+      return res.json();
+    }
+
+    function showPoster(index) {
+      if (posterList.length === 0) return;
+      const name = posterList[index];
+      posterEl.src = CONFIG.posterFolder + "/" + name + "?t=" + Date.now();
+      statusEl.textContent = name;
+    }
+
+    function startCycle() {
+      if (cycleTimer) clearInterval(cycleTimer);
+      cycleTimer = setInterval(() => {
+        currentIndex = (currentIndex + 1) % posterList.length;
+        showPoster(currentIndex);
+      }, CONFIG.cycleSeconds * 1000);
+    }
+
+    // Placeholder for the future Jellyfin integration.
+    // When CONFIG.enableJellyfin is true, this checks a local endpoint
+    // (to be built later) that reports what is currently playing on Jellyfin,
+    // and swaps the displayed poster to match instead of cycling normally.
+    async function checkJellyfin() {
+      try {
+        const res = await fetch("/api/now-playing");
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data && data.posterFile) {
+          if (cycleTimer) {
+            clearInterval(cycleTimer);
+            cycleTimer = null;
+          }
+          posterEl.src = data.posterFile + "?t=" + Date.now();
+          statusEl.textContent = "Now playing: " + (data.title || data.posterFile);
+        } else if (!cycleTimer) {
+          // nothing playing, go back to the loop
+          startCycle();
+        }
+      } catch (err) {
+        // Jellyfin endpoint not built yet or unreachable. Ignore for now.
+      }
+    }
+
+    async function init() {
+      posterList = await loadPosterList();
+      if (posterList.length === 0) {
+        statusEl.textContent = "No GIF files found in the posters folder.";
+        return;
+      }
+      showPoster(currentIndex);
+      startCycle();
+
+      if (CONFIG.enableJellyfin) {
+        setInterval(checkJellyfin, CONFIG.jellyfinPollSeconds * 1000);
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>

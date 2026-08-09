@@ -1,0 +1,14 @@
+[Unit]
+Description=LobbyLoop Chromium kiosk
+After=lobbyloop-server.service graphical.target
+Requires=lobbyloop-server.service
+
+[Service]
+Type=simple
+User=pi
+ExecStart=/home/pi/lobbyloop/kiosk.sh
+Restart=on-failure
+Environment=DISPLAY=:0
+
+[Install]
+WantedBy=graphical.target

@@ -16,17 +16,36 @@
 set -e
 
 REPO_URL="https://github.com/rorpage/lobbyloop.git"
-INSTALL_DIR="/home/pi/lobbyloop"
-SERVICE_USER="pi"
-
-echo "LobbyLoop install script"
-echo "-------------------------"
 
 # Check for root, since apt and systemctl need it.
 if [ "$(id -u)" -ne 0 ]; then
   echo "This script needs to run as root. Try: sudo bash install.sh"
   exit 1
 fi
+
+# Figure out which user actually ran the script, so the install goes into
+# their home directory and the services run as them, not as root.
+if [ -n "$SUDO_USER" ]; then
+  SERVICE_USER="$SUDO_USER"
+else
+  echo "Could not detect which user ran sudo."
+  echo "Run this script with: sudo bash install.sh"
+  echo "(not as a root login shell, and not with 'su' first)"
+  exit 1
+fi
+
+SERVICE_HOME=$(getent passwd "$SERVICE_USER" | cut -d: -f6)
+if [ -z "$SERVICE_HOME" ]; then
+  echo "Could not find a home directory for user $SERVICE_USER."
+  exit 1
+fi
+
+INSTALL_DIR="$SERVICE_HOME/lobbyloop"
+
+echo "LobbyLoop install script"
+echo "-------------------------"
+echo "Installing for user: $SERVICE_USER"
+echo "Install directory: $INSTALL_DIR"
 
 echo "Installing required packages (git, chromium-browser, unclutter)..."
 apt update
@@ -52,8 +71,10 @@ mkdir -p "$INSTALL_DIR/posters"
 chown -R "$SERVICE_USER":"$SERVICE_USER" "$INSTALL_DIR"
 
 echo "Installing systemd service files..."
-cp "$INSTALL_DIR/lobbyloop-server.service" /etc/systemd/system/
-cp "$INSTALL_DIR/lobbyloop-kiosk.service" /etc/systemd/system/
+sed -e "s|__SERVICE_USER__|$SERVICE_USER|g" -e "s|__INSTALL_DIR__|$INSTALL_DIR|g" \
+  "$INSTALL_DIR/lobbyloop-server.service" > /etc/systemd/system/lobbyloop-server.service
+sed -e "s|__SERVICE_USER__|$SERVICE_USER|g" -e "s|__INSTALL_DIR__|$INSTALL_DIR|g" \
+  "$INSTALL_DIR/lobbyloop-kiosk.service" > /etc/systemd/system/lobbyloop-kiosk.service
 
 echo "Reloading systemd and enabling services..."
 systemctl daemon-reload

@@ -4,9 +4,9 @@ After=network.target
 
 [Service]
 Type=simple
-User=pi
-WorkingDirectory=/home/pi/lobbyloop
-ExecStart=/usr/bin/python3 /home/pi/lobbyloop/server.py
+User=__SERVICE_USER__
+WorkingDirectory=__INSTALL_DIR__
+ExecStart=/usr/bin/python3 __INSTALL_DIR__/server.py
 Restart=on-failure
 
 [Install]

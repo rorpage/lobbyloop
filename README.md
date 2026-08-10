@@ -28,13 +28,15 @@ On the Pi, run:
 curl -fsSL https://raw.githubusercontent.com/rorpage/lobbyloop/main/install.sh | sudo bash
 ```
 
-This clones the repo to `/home/pi/lobbyloop`, installs Chromium and
-unclutter, sets permissions, and installs and starts the two systemd
-services. Running it again later pulls the latest version and restarts the
-services.
+This installs for whichever user ran `sudo`, so it works whether your
+username is `pi` or something else. It clones the repo into that user's
+home directory, for example `/home/pi/lobbyloop` or `/home/robbie/lobbyloop`,
+installs Chromium and unclutter, sets permissions, and installs and starts
+the two systemd services. Running it again later pulls the latest version
+and restarts the services.
 
-After it finishes, add your GIF files to `/home/pi/lobbyloop/posters`, then
-reboot:
+After it finishes, add your GIF files to the `posters` folder inside that
+install directory, then reboot:
 
 ```
 sudo reboot
@@ -43,12 +45,18 @@ sudo reboot
 The Pi should come up straight into the poster loop with no desktop
 visible.
 
+Note: run this with `sudo bash`, not by switching to a root shell first.
+The script needs to see who you are through `sudo` to know where to
+install things.
+
 ## Manual setup
 
 If you would rather set it up by hand, or want to understand what
 `install.sh` is doing:
 
-1. Copy this whole folder to the Pi, for example to `/home/pi/lobbyloop`.
+1. Copy this whole folder to the Pi, into your own home directory. The
+   steps below use `/home/pi/lobbyloop` as an example, replace `pi` with
+   your actual username if it is different.
 
 2. Put your GIF files in `/home/pi/lobbyloop/posters`.
 
@@ -71,10 +79,15 @@ If you would rather set it up by hand, or want to understand what
    open `http://<pi-ip-address>:8080` in a browser and confirm the GIFs
    cycle correctly.
 
-6. If that works, set up the two services so everything starts on boot:
+6. If that works, set up the two services so everything starts on boot.
+   The two `.service` files use `__SERVICE_USER__` and `__INSTALL_DIR__` as
+   placeholders, so fill those in with your actual username and full path
+   before copying them over:
    ```
-   sudo cp lobbyloop-server.service /etc/systemd/system/
-   sudo cp lobbyloop-kiosk.service /etc/systemd/system/
+   sed -e "s|__SERVICE_USER__|pi|g" -e "s|__INSTALL_DIR__|/home/pi/lobbyloop|g" \
+     lobbyloop-server.service | sudo tee /etc/systemd/system/lobbyloop-server.service > /dev/null
+   sed -e "s|__SERVICE_USER__|pi|g" -e "s|__INSTALL_DIR__|/home/pi/lobbyloop|g" \
+     lobbyloop-kiosk.service | sudo tee /etc/systemd/system/lobbyloop-kiosk.service > /dev/null
    sudo systemctl daemon-reload
    sudo systemctl enable lobbyloop-server.service
    sudo systemctl enable lobbyloop-kiosk.service

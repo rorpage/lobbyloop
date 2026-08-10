@@ -5,8 +5,8 @@ Requires=lobbyloop-server.service
 
 [Service]
 Type=simple
-User=pi
-ExecStart=/home/pi/lobbyloop/kiosk.sh
+User=__SERVICE_USER__
+ExecStart=__INSTALL_DIR__/kiosk.sh
 Restart=on-failure
 Environment=DISPLAY=:0
 

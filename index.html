@@ -28,14 +28,6 @@
   #posterVideo {
     display: none;
   }
-  #status {
-    position: fixed;
-    bottom: 8px;
-    right: 12px;
-    color: #444;
-    font-family: monospace;
-    font-size: 12px;
-  }
 </style>
 </head>
 <body>
@@ -43,7 +35,6 @@
     <img id="poster" src="" alt="poster">
     <video id="posterVideo" autoplay muted loop playsinline></video>
   </div>
-  <div id="status"></div>
 
   <script>
     // Config. Edit these values to change behavior.
@@ -87,7 +78,6 @@
 
     const posterEl = document.getElementById("poster");
     const videoEl = document.getElementById("posterVideo");
-    const statusEl = document.getElementById("status");
 
     function isVideoFile(name) {
       const lower = name.toLowerCase();
@@ -106,13 +96,13 @@
         posterEl.style.display = "block";
         posterEl.src = url;
       }
-      statusEl.textContent = label;
+      console.log("Showing:", label);
     }
 
     async function loadPosterList() {
       const res = await fetch("/api/posters");
       if (!res.ok) {
-        statusEl.textContent = "Could not load poster list.";
+        console.error("Could not load poster list.");
         return [];
       }
       return res.json();
@@ -161,7 +151,7 @@
       applyRotation(CONFIG.rotateDegrees);
       posterList = await loadPosterList();
       if (posterList.length === 0) {
-        statusEl.textContent = "No poster files found in the posters folder.";
+        console.warn("No poster files found in the posters folder.");
         return;
       }
       showPoster(currentIndex);

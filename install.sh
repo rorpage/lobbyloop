@@ -47,9 +47,19 @@ echo "-------------------------"
 echo "Installing for user: $SERVICE_USER"
 echo "Install directory: $INSTALL_DIR"
 
-echo "Installing required packages (git, chromium-browser, unclutter)..."
+echo "Installing required packages (git, unclutter, and Chromium)..."
 apt update
-apt install -y git chromium-browser unclutter
+apt install -y git unclutter
+
+if apt-cache show chromium >/dev/null 2>&1; then
+  apt install -y chromium
+elif apt-cache show chromium-browser >/dev/null 2>&1; then
+  apt install -y chromium-browser
+else
+  echo "Could not find a chromium or chromium-browser package to install."
+  echo "Install a Chromium browser manually, then run this script again."
+  exit 1
+fi
 
 if [ -d "$INSTALL_DIR/.git" ]; then
   echo "$INSTALL_DIR already exists. Pulling the latest version..."

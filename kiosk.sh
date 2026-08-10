@@ -8,7 +8,18 @@ export DISPLAY=:0
 # Install with: sudo apt install unclutter
 unclutter -idle 0.5 -root &
 
-chromium-browser \
+# The Chromium binary is named differently depending on the Raspberry Pi OS
+# version. Bookworm uses "chromium", older Bullseye uses "chromium-browser".
+if command -v chromium >/dev/null 2>&1; then
+  BROWSER_BIN="chromium"
+elif command -v chromium-browser >/dev/null 2>&1; then
+  BROWSER_BIN="chromium-browser"
+else
+  echo "Could not find chromium or chromium-browser installed. Run install.sh again, or install one manually."
+  exit 1
+fi
+
+"$BROWSER_BIN" \
   --noerrdialogs \
   --disable-infobars \
   --kiosk \

@@ -15,6 +15,8 @@ of just looping.
 - `lobbyloop-server.service`: systemd unit to start `server.py` on boot.
 - `lobbyloop-kiosk.service`: systemd unit to start Chromium kiosk mode on boot.
 - `install.sh`: automates the setup steps below.
+- `convert-posters.sh`: converts GIF posters to mp4, for much faster
+  playback on a Raspberry Pi.
 
 ## Quick install
 
@@ -100,6 +102,43 @@ If you would rather set it up by hand, or want to understand what
    ```
    sudo reboot
    ```
+
+## If GIF playback is slow
+
+Animated GIFs are decoded frame by frame in software by the browser, with
+no hardware help. On older Raspberry Pi models especially, this can make
+playback slow or choppy, even with small GIF files, if the images are a
+decent resolution.
+
+The fix is to convert your posters to mp4 video instead. Video decoding
+gets real hardware support on the Pi, so it is much lighter on the CPU.
+LobbyLoop already supports mixing GIF and mp4 files in the posters folder,
+so you can convert gradually.
+
+To convert everything already in your posters folder:
+
+1. Install ffmpeg if it is not already installed:
+   ```
+   sudo apt install ffmpeg
+   ```
+
+2. Run the conversion script:
+   ```
+   bash convert-posters.sh
+   ```
+
+3. Check the resulting mp4 files look right, then delete the original
+   GIFs from the posters folder so LobbyLoop only cycles through the
+   faster video versions.
+
+For any new posters going forward, save or convert them as mp4 from the
+start rather than as GIF.
+
+A note on hardware acceleration: `kiosk.sh` includes Chromium flags meant
+to enable hardware video decode, but whether this actually kicks in
+depends on your specific Raspberry Pi OS version and Chromium build. Even
+without it, video decoding through Chromium is still noticeably lighter
+than GIF decoding, so converting should help either way.
 
 ## Changing settings
 

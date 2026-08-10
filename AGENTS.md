@@ -38,11 +38,13 @@ any text generated for this project:
 
 ## File structure
 
-- `index.html`: the display page, including poster cycling and the
-  Jellyfin polling stub.
+- `index.html`: the display page, including poster cycling, video and GIF
+  playback, and the Jellyfin polling stub.
 - `server.py`: serves the page and the small JSON API (`/api/posters`,
-  `/api/now-playing`).
-- `posters/`: local GIF files to loop through.
+  `/api/now-playing`). Lists both GIF and video poster files.
+- `posters/`: local GIF or mp4 files to loop through.
+- `convert-posters.sh`: batch converts GIF posters to mp4, for better
+  playback performance on a Raspberry Pi.
 - `kiosk.sh`: launches Chromium in fullscreen kiosk mode.
 - `lobbyloop-server.service`, `lobbyloop-kiosk.service`: systemd units for
   running the server and kiosk browser on boot.

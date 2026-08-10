@@ -19,11 +19,14 @@
     width: 100%;
     height: 100%;
   }
-  #poster {
+  #poster, #posterVideo {
     width: 100%;
     height: 100%;
     object-fit: contain;
     display: block;
+  }
+  #posterVideo {
+    display: none;
   }
   #status {
     position: fixed;
@@ -38,6 +41,7 @@
 <body>
   <div id="wrapper">
     <img id="poster" src="" alt="poster">
+    <video id="posterVideo" autoplay muted loop playsinline></video>
   </div>
   <div id="status"></div>
 
@@ -82,7 +86,28 @@
     let cycleTimer = null;
 
     const posterEl = document.getElementById("poster");
+    const videoEl = document.getElementById("posterVideo");
     const statusEl = document.getElementById("status");
+
+    function isVideoFile(name) {
+      const lower = name.toLowerCase();
+      return lower.endsWith(".mp4") || lower.endsWith(".webm");
+    }
+
+    function displayMedia(url, label) {
+      if (isVideoFile(url)) {
+        posterEl.style.display = "none";
+        videoEl.style.display = "block";
+        videoEl.src = url;
+        videoEl.play().catch(() => {});
+      } else {
+        videoEl.pause();
+        videoEl.style.display = "none";
+        posterEl.style.display = "block";
+        posterEl.src = url;
+      }
+      statusEl.textContent = label;
+    }
 
     async function loadPosterList() {
       const res = await fetch("/api/posters");
@@ -96,8 +121,8 @@
     function showPoster(index) {
       if (posterList.length === 0) return;
       const name = posterList[index];
-      posterEl.src = CONFIG.posterFolder + "/" + name + "?t=" + Date.now();
-      statusEl.textContent = name;
+      const url = CONFIG.posterFolder + "/" + name + "?t=" + Date.now();
+      displayMedia(url, name);
     }
 
     function startCycle() {
@@ -122,8 +147,7 @@
             clearInterval(cycleTimer);
             cycleTimer = null;
           }
-          posterEl.src = data.posterFile + "?t=" + Date.now();
-          statusEl.textContent = "Now playing: " + (data.title || data.posterFile);
+          displayMedia(data.posterFile + "?t=" + Date.now(), "Now playing: " + (data.title || data.posterFile));
         } else if (!cycleTimer) {
           // nothing playing, go back to the loop
           startCycle();

@@ -25,4 +25,6 @@ fi
   --kiosk \
   --incognito \
   --check-for-update-interval=31536000 \
+  --enable-accelerated-video-decode \
+  --ignore-gpu-blocklist \
   http://localhost:8080

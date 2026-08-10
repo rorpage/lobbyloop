@@ -29,11 +29,13 @@ class LobbyLoopHandler(http.server.SimpleHTTPRequestHandler):
         else:
             super().do_GET()
 
+    POSTER_EXTENSIONS = (".gif", ".mp4", ".webm")
+
     def handle_poster_list(self):
         try:
             files = [
                 f for f in os.listdir(POSTER_DIR)
-                if f.lower().endswith(".gif")
+                if f.lower().endswith(self.POSTER_EXTENSIONS)
             ]
             files.sort()
         except FileNotFoundError:

@@ -161,7 +161,7 @@
       applyRotation(CONFIG.rotateDegrees);
       posterList = await loadPosterList();
       if (posterList.length === 0) {
-        statusEl.textContent = "No GIF files found in the posters folder.";
+        statusEl.textContent = "No poster files found in the posters folder.";
         return;
       }
       showPoster(currentIndex);

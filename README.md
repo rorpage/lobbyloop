@@ -9,7 +9,8 @@ of just looping.
 - `index.html`: the page that displays and cycles the GIFs.
 - `server.py`: a small Python web server that serves the page and the poster
   list. No extra Python packages needed, it only uses the standard library.
-- `posters/`: put your GIF files in this folder.
+- `posters/`: put your poster files in this folder. Supports GIF, mp4,
+  webm, JPG, PNG, and WebP.
 - `kiosk.sh`: launches Chromium fullscreen with no window chrome and no
   visible cursor.
 - `lobbyloop-server.service`: systemd unit to start `server.py` on boot.
@@ -112,8 +113,13 @@ decent resolution.
 
 The fix is to convert your posters to mp4 video instead. Video decoding
 gets real hardware support on the Pi, so it is much lighter on the CPU.
-LobbyLoop already supports mixing GIF and mp4 files in the posters folder,
-so you can convert gradually.
+LobbyLoop already supports mixing GIF, mp4, and static image files in the
+posters folder, so you can convert gradually.
+
+If a poster does not actually need to be animated, using a static JPG,
+PNG, or WebP instead of a GIF is another easy way to reduce load on the
+Pi, since static images render even more cheaply than either GIFs or
+video.
 
 To convert everything already in your posters folder:
 

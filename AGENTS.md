@@ -42,7 +42,8 @@ any text generated for this project:
   playback, and the Jellyfin polling stub.
 - `server.py`: serves the page and the small JSON API (`/api/posters`,
   `/api/now-playing`). Lists both GIF and video poster files.
-- `posters/`: local GIF or mp4 files to loop through.
+- `posters/`: local poster files to loop through. Supports GIF, mp4,
+  webm, JPG, PNG, and WebP.
 - `convert-posters.sh`: batch converts GIF posters to mp4, for better
   playback performance on a Raspberry Pi.
 - `kiosk.sh`: launches Chromium in fullscreen kiosk mode.

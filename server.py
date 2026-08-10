@@ -29,7 +29,7 @@ class LobbyLoopHandler(http.server.SimpleHTTPRequestHandler):
         else:
             super().do_GET()
 
-    POSTER_EXTENSIONS = (".gif", ".mp4", ".webm")
+    POSTER_EXTENSIONS = (".gif", ".mp4", ".webm", ".jpg", ".jpeg", ".png", ".webp")
 
     def handle_poster_list(self):
         try:

@@ -109,6 +109,10 @@ Open `index.html` and edit the `CONFIG` object near the top of the script:
   the next one.
 - `posterFolder`: the folder name the GIFs are served from. Leave this as
   `posters` unless you rename the folder.
+- `rotateDegrees`: rotates the display. Set to `0`, `90`, `180`, or `270`.
+  Use this if the monitor is mounted in portrait orientation. If the image
+  comes out upside down or rotated the wrong way, try `270` instead of
+  `90`, or vice versa.
 
 ## Adding Jellyfin later
 

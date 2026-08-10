@@ -12,6 +12,13 @@
     background: black;
     overflow: hidden;
   }
+  #wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
   #poster {
     width: 100%;
     height: 100%;
@@ -29,7 +36,9 @@
 </style>
 </head>
 <body>
-  <img id="poster" src="" alt="poster">
+  <div id="wrapper">
+    <img id="poster" src="" alt="poster">
+  </div>
   <div id="status"></div>
 
   <script>
@@ -38,8 +47,35 @@
       posterFolder: "posters",
       cycleSeconds: 15,        // how long each GIF stays on screen
       enableJellyfin: false,   // set to true later to enable now-playing mode
-      jellyfinPollSeconds: 10  // how often to check Jellyfin for now-playing
+      jellyfinPollSeconds: 10, // how often to check Jellyfin for now-playing
+      rotateDegrees: 90        // 0, 90, 180, or 270. Rotates the display.
     };
+
+    const wrapperEl = document.getElementById("wrapper");
+
+    function applyRotation(degrees) {
+      if (degrees === 90) {
+        wrapperEl.style.width = "100vh";
+        wrapperEl.style.height = "100vw";
+        wrapperEl.style.transformOrigin = "top left";
+        wrapperEl.style.transform = "rotate(90deg) translateY(-100%)";
+      } else if (degrees === 180) {
+        wrapperEl.style.width = "100vw";
+        wrapperEl.style.height = "100vh";
+        wrapperEl.style.transformOrigin = "center center";
+        wrapperEl.style.transform = "rotate(180deg)";
+      } else if (degrees === 270) {
+        wrapperEl.style.width = "100vh";
+        wrapperEl.style.height = "100vw";
+        wrapperEl.style.transformOrigin = "top left";
+        wrapperEl.style.transform = "rotate(270deg) translateX(-100%)";
+      } else {
+        // 0 degrees, no rotation.
+        wrapperEl.style.width = "100vw";
+        wrapperEl.style.height = "100vh";
+        wrapperEl.style.transform = "none";
+      }
+    }
 
     let posterList = [];
     let currentIndex = 0;
@@ -98,6 +134,7 @@
     }
 
     async function init() {
+      applyRotation(CONFIG.rotateDegrees);
       posterList = await loadPosterList();
       if (posterList.length === 0) {
         statusEl.textContent = "No GIF files found in the posters folder.";

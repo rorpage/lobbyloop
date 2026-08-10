@@ -95,7 +95,7 @@
     }
 
     function displayMedia(url, label) {
-      if (isVideoFile(url)) {
+      if (isVideoFile(label)) {
         posterEl.style.display = "none";
         videoEl.style.display = "block";
         videoEl.src = url;

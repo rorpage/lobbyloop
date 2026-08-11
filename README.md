@@ -10,7 +10,10 @@ of just looping.
 - `server.py`: a small Python web server that serves the page and the poster
   list. No extra Python packages needed, it only uses the standard library.
 - `posters/`: put your poster files in this folder. Supports GIF, mp4,
-  webm, JPG, PNG, and WebP.
+  webm, JPG, PNG, and WebP. [The Movie Database](https://www.themoviedb.org)
+  has high quality static posters for download: find the movie's page, then
+  append `/images/posters` to the URL, e.g.
+  https://www.themoviedb.org/movie/105-back-to-the-future/images/posters.
 - `kiosk.sh`: launches Chromium fullscreen with no window chrome and no
   visible cursor.
 - `lobbyloop-server.service`: systemd unit to start `server.py` on boot.
@@ -152,6 +155,8 @@ Open `index.html` and edit the `CONFIG` object near the top of the script:
 
 - `cycleSeconds`: how long each poster stays on screen before switching to
   the next one.
+- `fadeSeconds`: how long the fade out/in transition takes when switching
+  posters.
 - `posterFolder`: the folder name the GIFs are served from. Leave this as
   `posters` unless you rename the folder.
 - `rotateDegrees`: rotates the display. Set to `0`, `90`, `180`, or `270`.

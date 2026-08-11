@@ -18,6 +18,8 @@
     left: 0;
     width: 100%;
     height: 100%;
+    opacity: 1;
+    transition: opacity 1s ease;
   }
   #poster, #posterVideo {
     width: 100%;
@@ -41,6 +43,7 @@
     const CONFIG = {
       posterFolder: "posters",
       cycleSeconds: 15,        // how long each GIF stays on screen
+      fadeSeconds: 1,          // how long the fade out/in transition takes
       enableJellyfin: false,   // set to true later to enable now-playing mode
       jellyfinPollSeconds: 10, // how often to check Jellyfin for now-playing
       rotateDegrees: 90        // 0, 90, 180, or 270. Rotates the display.
@@ -85,18 +88,22 @@
     }
 
     function displayMedia(url, label) {
-      if (isVideoFile(label)) {
-        posterEl.style.display = "none";
-        videoEl.style.display = "block";
-        videoEl.src = url;
-        videoEl.play().catch(() => {});
-      } else {
-        videoEl.pause();
-        videoEl.style.display = "none";
-        posterEl.style.display = "block";
-        posterEl.src = url;
-      }
-      console.log("Showing:", label);
+      wrapperEl.style.opacity = 0;
+      setTimeout(() => {
+        if (isVideoFile(label)) {
+          posterEl.style.display = "none";
+          videoEl.style.display = "block";
+          videoEl.src = url;
+          videoEl.play().catch(() => {});
+        } else {
+          videoEl.pause();
+          videoEl.style.display = "none";
+          posterEl.style.display = "block";
+          posterEl.src = url;
+        }
+        wrapperEl.style.opacity = 1;
+        console.log("Showing:", label);
+      }, CONFIG.fadeSeconds * 1000);
     }
 
     async function loadPosterList() {
@@ -149,6 +156,7 @@
 
     async function init() {
       applyRotation(CONFIG.rotateDegrees);
+      wrapperEl.style.transitionDuration = CONFIG.fadeSeconds + "s";
       posterList = await loadPosterList();
       if (posterList.length === 0) {
         console.warn("No poster files found in the posters folder.");
